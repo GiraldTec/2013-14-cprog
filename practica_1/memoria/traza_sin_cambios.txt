@@ -1,0 +1,17 @@
+Cliente 0: deposito de 20 Euros en cuenta #0 con cajero 0
+Cliente 1: deposito de 50 Euros en cuenta #0 con cajero 0
+Cliente 2: deposito de 10 Euros en cuenta #1 con cajero 1
+Cuenta #1: saldo es 0 Euros (pedido por Cajero 1)
+Cuenta #1: actualizado a 10 Euros por cajero 1
+Cliente 2: reintegro de 50 Euros en cuenta #1 con cajero 1
+Cuenta #0: saldo es 0 Euros (pedido por Cajero 0)
+Cuenta #0: saldo es 0 Euros (pedido por Cajero 0)
+Cuenta #0: actualizado a 20 Euros por cajero 0
+Cliente 0: reintegro de 100 Euros en cuenta #0 con cajero 0
+Cuenta #1: saldo es 10 Euros (pedido por Cajero 1)
+Cuenta #0: saldo es 20 Euros (pedido por Cajero 0)
+Cuenta #0: actualizado a -80 Euros por cajero 0
+ERROR: saldo negativo
+Cuenta #1: actualizado a -40 Euros por cajero 1
+ERROR: saldo negativo
+Cliente 3: deposito de 10 Euros en cuenta #1 con cajero 1
