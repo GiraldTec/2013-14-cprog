@@ -107,7 +107,7 @@ class Cliente extends Thread {
                        " Euros en cuenta #" + cue + " con cajero " + caj);
     synchronized(Banco2.cajeros[caj]) {
     	Banco2.cajeros[caj].realizar_deposito(Banco2.cuentas[cue],cantidad,this);
-    	notifyAll();
+    	Banco2.cajeros[caj].notifyAll();
     }
     Banco2.liquidez += cantidad;
   }
@@ -118,7 +118,7 @@ class Cliente extends Thread {
     synchronized(Banco2.cajeros[caj]) {
     	try {
 	    	while (cantidad > Banco2.cuentas[cue].saldo(Banco2.cajeros[caj])){
-	    		wait();
+	    		Banco2.cajeros[caj].wait();
 			}
     	} catch (InterruptedException e) {
 			e.printStackTrace();
