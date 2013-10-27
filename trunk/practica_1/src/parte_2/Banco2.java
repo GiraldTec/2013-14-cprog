@@ -105,26 +105,28 @@ class Cliente extends Thread {
   protected void hacer_deposito(int caj, int cue, int cantidad) {
     System.out.println("Cliente " + id + ": deposito de " + cantidad +
                        " Euros en cuenta #" + cue + " con cajero " + caj);
-    synchronized(Banco2.cajeros[caj]) {
+    synchronized(Banco2.cuentas[cue]) {
     	Banco2.cajeros[caj].realizar_deposito(Banco2.cuentas[cue],cantidad,this);
-    	Banco2.cajeros[caj].notifyAll();
+    	Banco2.cuentas[cue].notifyAll();
+    	Banco2.liquidez += cantidad;
     }
-    Banco2.liquidez += cantidad;
   }
 
   protected void hacer_reintegro(int caj, int cue, int cantidad) {
-    System.out.println("Cliente " + id + ": reintegro de " + cantidad +
-                       " Euros en cuenta #" + cue + " con cajero " + caj);
-    synchronized(Banco2.cajeros[caj]) {
-    	try {
-	    	while (cantidad > Banco2.cuentas[cue].saldo(Banco2.cajeros[caj])){
-	    		Banco2.cajeros[caj].wait();
-			}
-    	} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-    		Banco2.cajeros[caj].realizar_reintegro(Banco2.cuentas[cue],cantidad,this);
+    
+    synchronized(Banco2.cuentas[cue]) {
     	
+    	while (cantidad > Banco2.cuentas[cue].saldo(Banco2.cajeros[caj])){
+    		try {
+    			System.out.println("Cliente " + id + ": reintegro de " + cantidad +
+                        " Euros en cuenta #" + cue + " con cajero " + caj);
+    			Banco2.cuentas[cue].wait();
+	    	} catch (InterruptedException e) {
+	    		e.printStackTrace();
+	    	}	
+		}
+    	
+    	Banco2.cajeros[caj].realizar_reintegro(Banco2.cuentas[cue],cantidad,this);
     	Banco2.liquidez -= cantidad;
     }
    
