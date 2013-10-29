@@ -24,9 +24,9 @@ class Cajero {
 	   cta.actualizarSaldo(this, cta.saldo(this) + cantidad);
 	   cta.notifyAll();
      }
- }
+   }
 
-  public void realizar_reintegro(Cuenta cta, int cantidad, Cliente reintegrador) {
+   public void realizar_reintegro(Cuenta cta, int cantidad, Cliente reintegrador) {
 	  synchronized (cta){
 		  while (cantidad > cta.saldo(this)) { 
 	    	  try {
@@ -47,7 +47,7 @@ class Cajero {
 	      cta.actualizarSaldo(this, cta.saldo(this) - cantidad);
    
 	  }
-  }
+   }
 
   int id;
 
