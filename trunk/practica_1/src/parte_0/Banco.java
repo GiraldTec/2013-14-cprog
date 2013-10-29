@@ -1,5 +1,4 @@
-package parte_2;
-
+package parte_0;
 /**************************************************************************/
 /***                                                                    ***/
 /***                             Banco.java                             ***/
@@ -105,35 +104,15 @@ class Cliente extends Thread {
   protected void hacer_deposito(int caj, int cue, int cantidad) {
     System.out.println("Cliente " + id + ": deposito de " + cantidad +
                        " Euros en cuenta #" + cue + " con cajero " + caj);
-    synchronized(Banco2.cuentas[cue]) {
-    	Banco2.cajeros[caj].realizar_deposito(Banco2.cuentas[cue],cantidad,this);
-    	Banco2.cuentas[cue].notifyAll();
-    	Banco2.liquidez += cantidad;
-    }
+    Banco.cajeros[caj].realizar_deposito(Banco.cuentas[cue],cantidad,this);
+    Banco.liquidez += cantidad;
   }
 
   protected void hacer_reintegro(int caj, int cue, int cantidad) {
-    
-    synchronized(Banco2.cuentas[cue]) {
-    	
-    	while (cantidad > Banco2.cuentas[cue].saldo(Banco2.cajeros[caj])){
-    		try {
-    			System.out.println("Cliente " + id + ": reintegro de " + cantidad +
-                        " Euros en cuenta #" + cue + " con cajero " + caj);
-    			Banco2.cuentas[cue].wait();
-    			if (cantidad <= Banco2.cuentas[cue].saldo(Banco2.cajeros[caj]))
-	            	  System.err.println("Cajero: " + this.id + ", cuenta: " + Banco2.cuentas[cue].numCuenta(Banco2.cajeros[caj])
-	            	//+ "; hay ingresado: " + cta.saldo(this) + ", extrae importe: " + cantidad 
-	            	+ " [El cliente: "+ this + " SALE de la espera]");
-	    	} catch (InterruptedException e) {
-	    		e.printStackTrace();
-	    	}	
-		}
-    	
-    	Banco2.cajeros[caj].realizar_reintegro(Banco2.cuentas[cue],cantidad,this);
-    	Banco2.liquidez -= cantidad;
-    }
-   
+    System.out.println("Cliente " + id + ": reintegro de " + cantidad +
+                       " Euros en cuenta #" + cue + " con cajero " + caj);
+    Banco.cajeros[caj].realizar_reintegro(Banco.cuentas[cue],cantidad,this);
+    Banco.liquidez -= cantidad;
   }
 }
 
@@ -209,7 +188,7 @@ class Cliente3 extends Cliente {
   }
 }
 
-class Banco2 {
+class Banco {
   public final static int num_cue=4;
   public final static int num_caj=2;
   public static int liquidez=0;
