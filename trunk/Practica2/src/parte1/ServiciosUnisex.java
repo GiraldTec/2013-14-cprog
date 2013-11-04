@@ -3,10 +3,11 @@ package parte1;
 import java.util.concurrent.Semaphore;
 
 public class ServiciosUnisex {
-	static Semaphore banno = new Semaphore(1);
-	static Semaphore contadorPersonas = new Semaphore(4);
-	
+		
 	public static void main(String[] args){
+		Semaphore banno = new Semaphore(1);
+		Semaphore contadorPersonas = new Semaphore(4);
+		
 		Pecusa p_hombres= new Pecusa(banno);
 		Pecusa p_mujeres= new Pecusa(banno);
 		

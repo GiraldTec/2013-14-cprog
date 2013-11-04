@@ -20,7 +20,6 @@ public class Pecusa {
 		contadorPecusa++;
 		if (contadorPecusa == 1)
 			try{recursoCompartido.acquire();} catch(Exception e) {}
-		System.out.println("Hay en el bannio "+contadorPecusa);
 		protectorContador.release();
 	}
 
@@ -28,7 +27,6 @@ public class Pecusa {
 	    try {protectorContador.acquire();} catch(Exception e) {};
 		contadorPecusa--;
 		if (contadorPecusa == 0) recursoCompartido.release();
-		System.out.println("Hay en el bannio "+contadorPecusa);
 		protectorContador.release();
 	}
 }
