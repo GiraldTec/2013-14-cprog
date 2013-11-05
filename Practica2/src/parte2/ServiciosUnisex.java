@@ -27,8 +27,10 @@ public class ServiciosUnisex {
 					new PersonaNoStarve(i, "Hombre", p_hombres, contadorPersonas,torniquete).start();	
 					new PersonaNoStarve(i, "Mujer", p_mujeres, contadorPersonas,torniquete).start();
 				}
-			}
-			
+			}	
+		}else{
+			System.out.println("Introduce una opcion: starve/nostarve");
 		}
+		
 	}
 }
