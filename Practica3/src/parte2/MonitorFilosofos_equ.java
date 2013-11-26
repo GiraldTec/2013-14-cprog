@@ -1,21 +1,15 @@
 package parte2;
-
-class DeNotificacion {}
-
-class MonitorFilosofos_efi implements Monitor {
+class MonitorFilosofos_equ implements Monitor{
 
    private int numFils = 0;
    private int[] estado = null;
    private static final int
       THINKING = 0, HUNGRY = 1, EATING = 2, STARVING = 3;
-   private DeNotificacion[] notif;
 
-   public MonitorFilosofos_efi(int numFils) {
+   public MonitorFilosofos_equ(int numFils) {
       this.numFils = numFils;
       estado = new int[numFils];
       for (int i = 0; i < numFils; i++) estado[i] = THINKING;
-      this.notif = new DeNotificacion[numFils];
-      for (int i = 0; i < numFils; i++) notif[i] = new DeNotificacion();
    }
 
    private final int izquierda(int i) {
@@ -57,28 +51,17 @@ class MonitorFilosofos_efi implements Monitor {
 		}
 	}
 
-   public void takeForks(int i) {
+   public synchronized void takeForks(int i) {
       estado[i] = HUNGRY;
       prueba(i, true);
-      if (estado[i] != EATING)
-    	  synchronized (notif[i]){
-	         try {
-	        	 notif[i].wait();	
-	         } catch (InterruptedException e) {}
-	         
-    	  }
+      while (estado[i] != EATING)
+         try {wait();} catch (InterruptedException e) {}
    }
 
-   public void putForks(int i) {
+   public synchronized void putForks(int i) {
       estado[i] = THINKING;
       prueba(izquierda(i), false);
       prueba(derecha(i), false);
-      synchronized(notif[izquierda(i)]){
-	      if(estado[izquierda(i)] == EATING) notif[izquierda(i)].notify();
-      }
-	  synchronized(notif[derecha(i)]){
-		  if(estado[derecha(i)] == EATING) notif[derecha(i)].notify();
-	  }
-      //notifyAll();
+      notifyAll();
    }
 }
