@@ -4,64 +4,78 @@ import parte1.*;
 
 public class MonitorFIFO implements MonitorArbitraje {
 
+	private boolean hayEscritor = false;
+	private boolean habilitadoTicket = true;
+	private boolean lectoresSeguidos = true;
 	private int numLectores = 0;
-	private boolean escritor = false; 
 	private long startTime;
-	private int escritoresEnEspera = 0;
-	private boolean turnoLectores = true;
-	
+	private int turnoActual = 0;
+	private Secuenciador numTicket;
+
 	class Secuenciador{
-		int seq = 0;
-		public synchronized int ticket(){
-			return seq++;
+		public int seq = 0;
+		
+		public int ticket(){
+			return ++seq;
 		}
 	}
 	
 	MonitorFIFO() {
 		startTime = System.currentTimeMillis();
+		numTicket = new Secuenciador();
 	}
 
 	public synchronized void entrarLeer() throws InterruptedException {
-		while (!turnoLectores || escritor || escritoresEnEspera != 0) wait();
+		while (!habilitadoTicket)
+			wait();
 		
+		numTicket.ticket();
+		
+		while (hayEscritor || !lectoresSeguidos)
+		    wait();
+				
+		lectoresSeguidos = true;
 		numLectores++;
-		
 		System.out.println( (System.currentTimeMillis()-startTime) + ": "
-			+ Thread.currentThread().getName() + " va a empezar a leer");
+			+ Thread.currentThread().getName() + " va a empezar a leer " + numTicket.seq);
 	}
 
 	public synchronized void salirLeer() {
 		System.out.println( (System.currentTimeMillis()-startTime) + ": "
 			+ Thread.currentThread().getName() + " ha terminado de leer");
 		
+		turnoActual++;
 		numLectores--;
 		if (numLectores == 0){
-			turnoLectores = false;
 			notify();
-		} 
-			
+		}
 	}
 
 	public synchronized void entrarEscribir() throws InterruptedException {
-		escritoresEnEspera++;
-		if(turnoLectores && numLectores==0) turnoLectores = false;
-		while (escritor || numLectores != 0) wait();
-		escritor = true;
-		escritoresEnEspera--;
-
+		while (!habilitadoTicket)
+			wait();
+		
+		numTicket.ticket();
+		
+		lectoresSeguidos = false;
+		habilitadoTicket = false;
+		while (hayEscritor || (numTicket.seq > turnoActual + 1 && !hayEscritor))
+		    wait();
+		
+		hayEscritor = true;
+        lectoresSeguidos = true;
 		System.out.println( (System.currentTimeMillis()-startTime) + ": "
-			+ Thread.currentThread().getName()  + " va a empezar a escribir");
+			+ Thread.currentThread().getName()  + " va a empezar a escribir " + numTicket.seq);
 	}
 
 	public synchronized void salirEscribir() {
 		System.out.println( (System.currentTimeMillis()-startTime) + ": "
 			+ Thread.currentThread().getName() + " ha terminado de escribir");
 
-		escritor = false;
-		//if(escritoresEnEspera==0)
-		turnoLectores = true;
+		hayEscritor = false;
+		habilitadoTicket = true;
+		turnoActual++;
 		notifyAll();
-
 	}
 	
 }
