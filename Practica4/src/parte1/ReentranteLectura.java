@@ -8,11 +8,11 @@ public class ReentranteLectura implements MonitorArbitraje {
 	private boolean hayEscritor = false; 
 	private long startTime;
 	private int escritoresEnEspera = 0;
-	private HashMap<Long, Integer> threadMapLectura;
+	private HashMap<Thread, Integer> threadMapLectura;
 
 	ReentranteLectura() {
 		startTime = System.currentTimeMillis();
-		threadMapLectura = new HashMap<Long, Integer>();	
+		threadMapLectura = new HashMap<Thread, Integer>();	
 	}
 	
 	/*
@@ -23,11 +23,11 @@ public class ReentranteLectura implements MonitorArbitraje {
 	 */
 
 	public synchronized void entrarLeer() throws InterruptedException {
-		while ((hayEscritor || escritoresEnEspera != 0) && !tieneAccesoLectura(Thread.currentThread().getId())) 
+		while ((hayEscritor || escritoresEnEspera != 0) && !tieneAccesoLectura(Thread.currentThread())) 
 			wait();
 		
 		numLectores++;
-		entraThreadLectura(Thread.currentThread().getId());
+		entraThreadLectura(Thread.currentThread());
 		
 		System.out.println( (System.currentTimeMillis()-startTime) + ": "
 			+ Thread.currentThread().getName() + " va a empezar a leer");
@@ -38,7 +38,7 @@ public class ReentranteLectura implements MonitorArbitraje {
 			+ Thread.currentThread().getName() + " ha terminado de leer");
 		
 		numLectores--;
-		saleThreadLectura(Thread.currentThread().getId());
+		saleThreadLectura(Thread.currentThread());
 		
 		if (numLectores == 0) 
 			notify();
@@ -62,30 +62,30 @@ public class ReentranteLectura implements MonitorArbitraje {
 		notifyAll();
 	}
 	
-	private void entraThreadLectura(long id){
-		Integer count = threadMapLectura.get(id);
+	private void entraThreadLectura(Thread t){
+		Integer count = threadMapLectura.get(t);
 		if (count == null)
-			threadMapLectura.put(id, 1);
+			threadMapLectura.put(t, 1);
 		else{
-			threadMapLectura.put(id, ++count);
-			System.out.println("Entra thread lectura: " +id+ ", count: "+ count);
+			threadMapLectura.put(t, ++count);
+			System.out.println("Entra thread lectura: " +t.getName()+ ", count: "+ count);
 		}
 	}
 	
-	private void saleThreadLectura(long id){
-		Integer count = threadMapLectura.get(id);
+	private void saleThreadLectura(Thread t){
+		Integer count = threadMapLectura.get(t);
 		if (count == null)
-			System.err.println("Hubo un error: saleThreadLectura, el thread " +id+ " no existe!");
+			System.err.println("Hubo un error: saleThreadLectura, el thread " +t.getName()+ " no existe!");
 		else{
-			threadMapLectura.put(id, --count);
-			System.out.println("Sale thread lectura: " +id+ ", count: "+ count);
+			threadMapLectura.put(t, --count);
+			System.out.println("Sale thread lectura: " +t.getName()+ ", count: "+ count);
 		}
 	}
 	
-	private boolean tieneAccesoLectura(long id){
+	private boolean tieneAccesoLectura(Thread t){
 		// Si count es > 0, el thread ya ha entrado a leer por lo que tiene acceso lectura
 		
-		Integer count = threadMapLectura.get(id);
+		Integer count = threadMapLectura.get(t);
 		return count == null ? false : count > 0;
 	}
 }

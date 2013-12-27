@@ -6,15 +6,15 @@ import java.util.HashMap;
 public class RenentranteEscritura implements MonitorArbitraje {
 
 	private int numLectores = 0;
-	private boolean hayEscritor = false; 
 	private long startTime;
 	private int escritoresEnEspera = 0;
-	private HashMap<Long, Integer> hashmapLectura;
-	private int accesosEscritura;
+	private HashMap<Thread, Integer> threadMapLectura;
+	private int accesoEscritura = 0;
+	private Thread escritorDentro = null;
 
 	RenentranteEscritura() {
 		startTime = System.currentTimeMillis();
-		hashmapLectura = new HashMap<Long, Integer>();	
+		threadMapLectura = new HashMap<Thread, Integer>();	
 	}
 	
 	/*
@@ -25,11 +25,11 @@ public class RenentranteEscritura implements MonitorArbitraje {
 	 */
 
 	public synchronized void entrarLeer() throws InterruptedException {
-		while ((hayEscritor || escritoresEnEspera != 0) && !tieneAccesoLectura(Thread.currentThread().getId())) 
+		while ((escritorDentro!=null || escritoresEnEspera != 0) && !tieneAccesoLectura(Thread.currentThread())) 
 			wait();
 		
 		numLectores++;
-		entraThreadLectura(Thread.currentThread().getId());
+		entraThreadLectura(Thread.currentThread());
 		
 		System.out.println( (System.currentTimeMillis()-startTime) + ": "
 			+ Thread.currentThread().getName() + " va a empezar a leer");
@@ -40,7 +40,7 @@ public class RenentranteEscritura implements MonitorArbitraje {
 			+ Thread.currentThread().getName() + " ha terminado de leer");
 		
 		numLectores--;
-		saleThreadLectura(Thread.currentThread().getId());
+		saleThreadLectura(Thread.currentThread());
 		
 		if (numLectores == 0) 
 			notify();
@@ -48,46 +48,55 @@ public class RenentranteEscritura implements MonitorArbitraje {
 
 	public synchronized void entrarEscribir() throws InterruptedException {
 		escritoresEnEspera++;
-		while (hayEscritor || numLectores != 0) wait();
-		hayEscritor = true;
+		while ( (accesoEscritura>0 && escritorDentro!=Thread.currentThread())
+				//|| (escritorDentro!=null) 
+				|| numLectores != 0) wait();
+		
+		if(escritorDentro==null)escritorDentro=Thread.currentThread();
+		accesoEscritura++;
+		
 		escritoresEnEspera--;
 
 		System.out.println( (System.currentTimeMillis()-startTime) + ": "
-			+ Thread.currentThread().getName()  + " va a empezar a escribir");
+			+ Thread.currentThread().getName()  + " va a empezar a escribir por vez "+accesoEscritura);
 	}
 
 	public synchronized void salirEscribir() {
+		
+		accesoEscritura--;
+		if(accesoEscritura==0)escritorDentro = null;
+		
 		System.out.println( (System.currentTimeMillis()-startTime) + ": "
-			+ Thread.currentThread().getName() + " ha terminado de escribir");
+				+ Thread.currentThread().getName() + " ha terminado de escribir, le quedan "+accesoEscritura);
 
-		hayEscritor = false;
+		
 		notifyAll();
 	}
 	
-	private void entraThreadLectura(long id){
-		Integer count = hashmapLectura.get(id);
+	private void entraThreadLectura(Thread t){
+		Integer count = threadMapLectura.get(t);
 		if (count == null)
-			hashmapLectura.put(id, 1);
+			threadMapLectura.put(t, 1);
 		else{
-			hashmapLectura.put(id, ++count);
-			System.out.println("Entra thread lectura: " +id+ ", count: "+ count);
+			threadMapLectura.put(t, ++count);
+			System.out.println("Entra thread lectura: " +t.getName()+ ", count: "+ count);
 		}
 	}
 	
-	private void saleThreadLectura(long id){
-		Integer count = hashmapLectura.get(id);
+	private void saleThreadLectura(Thread t){
+		Integer count = threadMapLectura.get(t);
 		if (count == null)
-			System.err.println("Hubo un error: saleThreadLectura, el thread " +id+ " no existe!");
+			System.err.println("Hubo un error: saleThreadLectura, el thread " +t.getName()+ " no existe!");
 		else{
-			hashmapLectura.put(id, --count);
-			System.out.println("Sale thread lectura: " +id+ ", count: "+ count);
+			threadMapLectura.put(t, --count);
+			System.out.println("Sale thread lectura: " +t.getName()+ ", count: "+ count);
 		}
 	}
 	
-	private boolean tieneAccesoLectura(long id){
+	private boolean tieneAccesoLectura(Thread t){
 		// Si count es > 0, el thread ya ha entrado a leer por lo que tiene acceso lectura
 		
-		Integer count = hashmapLectura.get(id);
+		Integer count = threadMapLectura.get(t);
 		return count == null ? false : count > 0;
 	}
 }
