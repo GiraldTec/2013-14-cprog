@@ -1,11 +1,11 @@
-package parte3;
+package parte4;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 import parte1.MonitorArbitraje;
 
-public class ReentranteLecturaAEscritura implements MonitorArbitraje {
+public class ReentranteTotal implements MonitorArbitraje {
 
 	private int numLectores = 0;
 	private long startTime;
@@ -16,7 +16,7 @@ public class ReentranteLecturaAEscritura implements MonitorArbitraje {
 	private Thread escritorDentro = null;
 	private Thread unicoLectorDentro = null;
 
-	ReentranteLecturaAEscritura() {
+	ReentranteTotal() {
 		startTime = System.currentTimeMillis();
 		threadMapLectura = new HashMap<Thread, Integer>();
 		threadMapLecturaEsperaEscritura = new HashMap<Thread, Integer>();	
@@ -30,9 +30,12 @@ public class ReentranteLecturaAEscritura implements MonitorArbitraje {
 	 */
 
 	public synchronized void entrarLeer() throws InterruptedException {
-		while ((escritorDentro!=null || escritoresEnEspera != 0) && !tieneAccesoLectura(Thread.currentThread())) 
-			wait();
 		
+		if (!(tieneAccesoEscritura(Thread.currentThread())||tieneAccesoLectura(Thread.currentThread()))){
+			while((escritorDentro!=null || escritoresEnEspera != 0))
+				wait();	
+		}
+
 		numLectores++;
 		entraThreadLectura(Thread.currentThread());
 		
@@ -137,6 +140,11 @@ public class ReentranteLecturaAEscritura implements MonitorArbitraje {
 		
 		Integer count = threadMapLectura.get(t);
 		return count == null ? false : count > 0;
+	}
+	
+	private boolean tieneAccesoEscritura(Thread t){
+		// Si el escritor que hay dentro es �l mismo, tiene acceso a escritura
+		return escritorDentro == t;
 	}
 	
 	private Thread buscaUltimoLector() {
