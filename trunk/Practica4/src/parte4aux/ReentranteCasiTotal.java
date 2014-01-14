@@ -25,9 +25,18 @@ public class ReentranteCasiTotal implements MonitorArbitraje {
 	 */
 
 	public synchronized void entrarLeer() throws InterruptedException {
-		while ((escritorDentro!=null || escritoresEnEspera != 0) && 
-				(!tieneAccesoLectura(Thread.currentThread())||!tieneAccesoEscritura(Thread.currentThread()))) 
-			wait();
+		if (tieneAccesoEscritura(Thread.currentThread())||tieneAccesoLectura(Thread.currentThread())){
+			
+		}else{
+			while((escritorDentro!=null || escritoresEnEspera != 0))
+				wait();
+			
+			
+		}
+		
+//		while ((escritorDentro!=null || escritoresEnEspera != 0) && 
+//				(!tieneAccesoLectura(Thread.currentThread())||!tieneAccesoEscritura(Thread.currentThread()))) 
+//			wait();
 		
 		numLectores++;
 		entraThreadLectura(Thread.currentThread());
