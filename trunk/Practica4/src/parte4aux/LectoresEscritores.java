@@ -16,7 +16,7 @@ public class LectoresEscritores {
 			for (int i = 1; i <= numLectores; ++i) 
 				new LectorReentrante(monitor, BD, "Lector"+i).start();
 			for (int i = 1; i <= numEscritores; ++i) 
-				new EscritorReentrante(monitor, BD, "Escritor"+i).start();
+				new EscritorReentranteLee(monitor, BD, "Escritor"+i).start();
 		} catch (Exception e) {System.out.println("Exception: " + e);}
 	}
 	

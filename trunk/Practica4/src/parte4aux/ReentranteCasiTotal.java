@@ -25,7 +25,8 @@ public class ReentranteCasiTotal implements MonitorArbitraje {
 	 */
 
 	public synchronized void entrarLeer() throws InterruptedException {
-		while ((escritorDentro!=null || escritoresEnEspera != 0) && !tieneAccesoLectura(Thread.currentThread())) 
+		while ((escritorDentro!=null || escritoresEnEspera != 0) && 
+				(!tieneAccesoLectura(Thread.currentThread())||!tieneAccesoEscritura(Thread.currentThread()))) 
 			wait();
 		
 		numLectores++;
@@ -98,5 +99,10 @@ public class ReentranteCasiTotal implements MonitorArbitraje {
 		
 		Integer count = threadMapLectura.get(t);
 		return count == null ? false : count > 0;
+	}
+	
+	private boolean tieneAccesoEscritura(Thread t){
+		// Si el escritor que hay dentro es él mismo, tiene acceso a escritura
+		return escritorDentro == t;
 	}
 }
