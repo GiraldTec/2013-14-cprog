@@ -10,7 +10,7 @@ public class LectoresEscritores {
 	public static void main(String[] argv) {
  
 		BaseDatos BD = new BaseDatos();
-		RenentranteEscritura monitor = new RenentranteEscritura();
+		ReenentranteEscritura monitor = new ReenentranteEscritura();
 
 		try {
 			for (int i = 1; i <= numLectores; ++i) 

@@ -1,9 +1,9 @@
-package parte2;
+package parte3;
 
 import parte1.*;
 import java.util.HashMap;
 
-public class RenentranteEscritura implements MonitorArbitraje {
+public class ReentranteLecturaAEscritura implements MonitorArbitraje {
 
 	private int numLectores = 0;
 	private long startTime;
@@ -12,7 +12,7 @@ public class RenentranteEscritura implements MonitorArbitraje {
 	private int accesoEscritura = 0;
 	private Thread escritorDentro = null;
 
-	RenentranteEscritura() {
+	ReentranteLecturaAEscritura() {
 		startTime = System.currentTimeMillis();
 		threadMapLectura = new HashMap<Thread, Integer>();	
 	}
@@ -47,12 +47,14 @@ public class RenentranteEscritura implements MonitorArbitraje {
 	}
 
 	public synchronized void entrarEscribir() throws InterruptedException {
+		//Un hilo lector solo puede pasar a tener acceso en escritura si es el único lector que no está esperando
+		//escribir es decir, se permite a un hilo escribir cuando hay lectores dentro si todos ellos están esperando escribir
 		escritoresEnEspera++;
 		while ( (accesoEscritura>0 && escritorDentro!=Thread.currentThread())
 				//|| (escritorDentro!=null) 
 				|| numLectores != 0) wait();
 		
-		if(escritorDentro==null)escritorDentro=Thread.currentThread();
+		if(escritorDentro==null) escritorDentro=Thread.currentThread();
 		accesoEscritura++;
 		
 		escritoresEnEspera--;
