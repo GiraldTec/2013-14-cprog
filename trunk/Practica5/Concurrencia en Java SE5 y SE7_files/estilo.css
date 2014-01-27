@@ -1,0 +1,82 @@
+/* BEGIN code to comply with UC3M corporate image requirements, Simon 21/05/09 */
+/* Header same size as UC3M-logo image to avoid scaling effects at default scale */
+/* The UC3M-logo image was derived from a large jpg provided by the university */
+.header{
+    height: 99px;
+}
+img.logos{
+    border: none;
+}
+/* white UC3M+IT header with blue borders */
+.header.white{
+    background-color: white;
+}
+.headerBorderUc3mblue{
+    height: 6px;
+    background-image: url(http://www.it.uc3m.es/imag/uc3m-blue.png);
+    background-repeat: repeat;
+    border-top: thin solid black;
+    border-bottom: thin solid black;
+    font-size: 2pt;  /* workaround for IE7 */
+}
+img.logos.logoright{
+    float: right;
+    height: 75px;
+    margin-top: 12px;
+    margin-right: 20px;
+}
+img.logos.logoleft{
+    float: left;
+    height: 99px;
+}
+/* END code to comply with UC3M corporate image requirements */
+
+/* START alternative route to complying with UC3M corporate image requirements */
+/* blue UC3M header with IT titlebar below (e.g. IT/spickin/index_test1.html)*/
+.header.uc3mblue{
+    background-image: url(http://www.it.uc3m.es/imag/uc3m-blue.png);
+}
+img.logos.logoleftalone{
+    height: 99px;
+    margin-right: auto;
+}
+img.titlebar{
+    height: 33px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: white;
+}
+/* END alternative route to complying with UC3M corporate image requirements */
+
+body {background-color: white}
+ .menut { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px} 
+a:link { color: #003366} .peq { font-family: Verdana, Arial, Helvetica, sans-serif; 
+font-size: 11px; color: #666666; font-weight: bold} a:visited { color: #666666} 
+.rojo { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 
+bold; color: #990000} td { font-family: Arial, Helvetica, sans-serif; font-size: 
+10pt} A.azul:link {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 
+11px; color: #000066;; font-weight: normal} A.azul:visited {font-family: Verdana, 
+Arial, Helvetica, sans-serif; font-size: 11px} A.azul:hover {; color: #6666CC}.lista 
+{ list-style-image:  url(imag/lista.gif)} h3 { font-family: Verdana, Arial, Helvetica, 
+sans-serif; font-size: 10pt; font-weight: bold; color: #000033; border: none} 
+.little { font-family: Arial, Helvetica; font-size: 11px} select { font-family: 
+Verdana, Arial, Helvetica, sans-serif; font-size: 10px} .peqazul { font-family: 
+Verdana, Arial, Helvetica, sans-serif; color: #000066; font-weight: normal; font-size: 12px} .grisneg { font-family: 
+Arial, Helvetica, sans-serif; color: #666666; font-weight: bold } A.peque:link 
+{ font-size: 11px} A.peque:visited{ font-size: 11px}A.azullittle:link { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; color: #000066;; font-weight: normal }
+.negritagris {  font-weight: bold; color: #666666}
+table {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+.negritagrisoscuro { font-weight: bold; color: #333333}
+.rojoarial { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; font-weight: bold; color: #993333}
+
+#noalasupresion {
+/* netscape 4, IE 4.x-5.0/Win and other lesser browsers will use this */
+  position: absolute; left: 35%; top: 80px;
+}
+body > div#noalasupresion {
+	/* used by Netscape6+/Mozilla, Opera 5+, Konqueror, Safari, OmniWeb 4.5+, ICEbrowser */
+/*	position: fixed;*/
+}
+
+
