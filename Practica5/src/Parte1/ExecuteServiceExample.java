@@ -8,7 +8,7 @@ public class ExecuteServiceExample
 {
   final static int TASK_COUNT = 1000;
   final static int MAX_THREAD_COUNT = 50;
-  final static int MAX_COUNT = 10000000;
+  final static int MAX_COUNT = 100000;
   
   public static void main (String[] args)
   {
