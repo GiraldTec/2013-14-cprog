@@ -13,7 +13,6 @@ public class ExecuteServiceExample
   public static void main (String[] args)
   {
     
-    
     for (int numThreads = 1; numThreads <= MAX_THREAD_COUNT; numThreads++) {
       long startTime = System.nanoTime();
       ExecutorService pool = Executors.newFixedThreadPool(numThreads);
@@ -38,7 +37,4 @@ public class ExecuteServiceExample
     
     
   }
-  
-  
-
 }
