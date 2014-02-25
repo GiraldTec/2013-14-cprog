@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
  
 public class EjemploCompletionService {
  
@@ -42,27 +43,30 @@ public class EjemploCompletionService {
 	  } 
       // TERMINAR BUCLE.
 
-	  try {
+	  try {  
 	      // COMENZAR BUCLE. Para un número de veces = el tamaño de la lista de tareas
 	      for (int i=0; i<listaTareas.size(); i++){
-	    	// Pida una tarea completada al CompletionService
-	          // (espere si no ha terminado ninguna tarea todavía)
-	    	  Future<String> resultTarea = completionService.take();	// take() espera automáticamente a que se complete alguna tarea
-	          // Imprima el resultado de la tarea en la salida estándar.
-	    	  System.out.println(resultTarea.get());
+	        	// Pida una tarea completada al CompletionService
+	        	// (espere si no ha terminado ninguna tarea todavía)
+	        	Future<String> resultTarea = completionService.poll(1, TimeUnit.SECONDS);//take();	// take() espera automáticamente a que se complete alguna tarea
+	        	// Imprima el resultado de la tarea en la salida estándar.
+	    	  	if(resultTarea!=null)System.out.println(resultTarea.get());   
 	      }
 	  	  // TERMINAR BUCLE.
-	      
-		  } catch (InterruptedException e) {
-	          Thread.currentThread().interrupt();
-		  } catch (ExecutionException e) {
-	          Thread.currentThread().interrupt(); 
-		  }
-	      // Cierre el ExecutionService
-		  finally {
-	          if (pool != null) {
-	        	  pool.shutdownNow();
-	          }
-		  }
+	  }catch (InterruptedException e) {
+	    	Thread.currentThread().interrupt();
+	  }catch (ExecutionException e) {
+			Thread.currentThread().interrupt(); 
+	  }
+	  finally{
+		  // Cerrar el service
+		  try {
+		        pool.shutdown();
+		        pool.awaitTermination(10, TimeUnit.SECONDS);
+		      } catch (InterruptedException e) {
+		        pool.shutdownNow();
+		        e.printStackTrace();
+		      }
+	  }
 	 }
 }
