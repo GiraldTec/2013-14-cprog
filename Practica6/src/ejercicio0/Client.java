@@ -35,43 +35,25 @@
  * intended for use in the design, construction, operation or
  * maintenance of any nuclear facility.
  */
-package ejercicio1;
+package ejercicio0;
 
-import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+import java.rmi.registry.Registry;
 
+public class Client {
 
-// rmiregistry -J-Djava.rmi.server.useCodebaseOnly=false
-// http://docs.oracle.com/javase/7/docs/technotes/guides/rmi/enhancements-7.html
-public class Server implements Hello {
+    private Client() {}
 
-    public Server() {}
+    public static void main(String[] args) {
 
-    public String sayHello() {
-        return "Hello, world!";
-    }
-
-    public static void main(String args[]) {
-
+        String host = (args.length < 1) ? null : args[0];
         try {
-            Server obj = new Server();
-            Hello stub = (Hello) UnicastRemoteObject.exportObject(obj, 0);
-
-            // Bind the remote object's stub in the registry
-            Registry registry = LocateRegistry.getRegistry();
-            if (registry.lookup("Hello") != null){
-            	registry.unbind("Hello");
-            	registry.bind("Hello", stub);
-            }
-            else{
-            	registry.rebind("Hello", stub);
-            }
-
-            System.err.println("Server ready");
+            Registry registry = LocateRegistry.getRegistry(host);
+            Hello stub = (Hello) registry.lookup("Hello");
+            String response = stub.sayHello();
+            System.out.println("response: " + response);
         } catch (Exception e) {
-            System.err.println("Server exception: " + e.toString());
+            System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
         }
     }
