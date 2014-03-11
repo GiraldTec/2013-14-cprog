@@ -35,7 +35,7 @@
  * intended for use in the design, construction, operation or
  * maintenance of any nuclear facility.
  */
-package ejercicio1;
+package ejercicio0;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
