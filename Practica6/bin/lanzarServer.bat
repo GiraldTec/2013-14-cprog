@@ -1,0 +1,1 @@
+start java -classpath %~dp0 -Djava.rmi.server.codebase=file:%~dp0/ ejercicio3.Server
