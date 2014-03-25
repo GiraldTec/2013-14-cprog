@@ -1,4 +1,4 @@
-package ejercicio3;
+package ejercicio4;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;

@@ -1,4 +1,4 @@
-package ejercicio3;
+package ejercicio4;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -6,9 +6,9 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 
-public class Client implements Receiver{
+public class ClientPesado implements Receiver{
 // start java -classpath C:\hlocal\miconc\Practica6\bin ejercicio2.Client
-    private Client() {}
+    private ClientPesado() {}
     private static int id = -1;
     static Random rnd = new Random();
 
@@ -16,7 +16,7 @@ public class Client implements Receiver{
 
         String host = (args.length < 1) ? null : args[0];
         try {
-        	Client obj = new Client();
+        	ClientPesado obj = new ClientPesado();
             Receiver myStub = (Receiver) UnicastRemoteObject.exportObject(obj, 0);
 
             // Bind the remote object's stub in the registry
@@ -29,19 +29,19 @@ public class Client implements Receiver{
             
             registry = LocateRegistry.getRegistry(host);
             Chat stub = (Chat) registry.lookup("Chat");
-            String response = stub.darseDeAlta();
-            System.out.println(response);
-            id = Integer.parseInt(response.split(": ")[1]);
+            
              
        for (int cont=0;cont < 100; cont++){
-    	   Thread.sleep(rnd.nextInt(500));
-    	   stub.difundir("este es mi mensaje "+cont+" :: " + id );
+    	   Thread.sleep(rnd.nextInt(50));
+    	   String response = stub.darseDeAlta();
+           System.out.println(response);
+           id = Integer.parseInt(response.split(": ")[1]);
+           
+    	   // In case of "exit"
+           response = stub.darseDeBaja(id);
+           System.out.println(response);  
        }
-        
-        // In case of "exit"
-        response = stub.darseDeBaja(id);
-        System.out.println(response);
-        
+       
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
