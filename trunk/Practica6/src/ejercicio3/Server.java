@@ -40,7 +40,7 @@ public class Server implements Chat {
         Receiver stub;
 		try {
 			stub = (Receiver) registry.lookup("Receiver"); 
-			clientes.put(clientIDCounter++, stub);
+			clientes.put(new Integer(clientIDCounter++), stub);
 			
 		} catch (NotBoundException e) {
 			e.printStackTrace();
@@ -52,9 +52,8 @@ public class Server implements Chat {
 
 	@Override
 	public synchronized String darseDeBaja(Integer id) throws RemoteException {
-		clientes.remove(id);
-		
-		System.out.println("Server: se ha desconectado el cliente: "+id);
+		if(clientes.remove(id)==null) System.out.println("Server: NO se ha desconectado el cliente: "+id);
+		else System.out.println("Server: se ha desconectado el cliente: "+id);
 		return "Te has desconectado del servidor";
 	}
 

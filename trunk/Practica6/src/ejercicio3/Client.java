@@ -50,7 +50,7 @@ public class Client implements Receiver{
 
 	public String entregarMensaje(String mensaje) throws RemoteException {
 		String msg = mensaje.split("::")[0];
-		String ids = mensaje.split("::")[1];
+		String ids = mensaje.split(":: ")[1];
 		Integer aux = Integer.parseInt(ids);
 		
 		System.out.println("Client "+id+": recibo mensaje "+aux+">> " + msg);
