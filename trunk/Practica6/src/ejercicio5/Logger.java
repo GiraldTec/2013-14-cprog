@@ -1,4 +1,4 @@
-package ejercicio4;
+package ejercicio5;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -6,12 +6,17 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 
-public class Client implements Receiver{
+import ejercicio4.Chat;
+import ejercicio4.Message;
+import ejercicio4.Publisher;
+import ejercicio4.Receiver;
+
+public class Logger implements Receiver{
 // start java -classpath C:\hlocal\miconc\Practica6\bin ejercicio2.Client
 	private Publisher publisher;
 	
-    private Client() {
-    	setPublisher(new ScreenPublisher());
+    private Logger() {
+    	setPublisher(new LogPublisher("log.txt"));
     	publisher.start();
     }
     private static int id = -1;
@@ -21,7 +26,7 @@ public class Client implements Receiver{
 
         String host = (args.length < 1) ? null : args[0];
         try {
-        	Client obj = new Client();
+        	Logger obj = new Logger();
             Receiver myStub = (Receiver) UnicastRemoteObject.exportObject(obj, 0);
 
             // Bind the remote object's stub in the registry
@@ -37,15 +42,8 @@ public class Client implements Receiver{
             String response = stub.darseDeAlta();
             System.out.println(response);
             id = Integer.parseInt(response.split(": ")[1]);
-             
-       for (int cont=0;cont < 100; cont++){
-    	   Thread.sleep(rnd.nextInt(500));
-    	   stub.difundir("este es mi mensaje "+cont+" :: " + id );
-       }
-        
-        // In case of "exit"
-        response = stub.darseDeBaja(id);
-        System.out.println(response);
+            stub.difundir("Entra el LOG "+" :: " + id );
+      
         
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
@@ -58,7 +56,7 @@ public class Client implements Receiver{
 		String ids = mensaje.split(":: ")[1];  // ID de un cliente
 		String msgCounter = mensaje.split(":: ")[2];
 		
-		Message m = new Message(Integer.parseInt(msgCounter),"Client "+id+": recibo mensaje "+ids+">> " + msg);
+		Message m = new Message(Integer.parseInt(msgCounter),"Mensaje número: "+msgCounter+" >> Autor >> "+ ids + " >> " + msg);
 		
 		publisher.addMessage(m);
 		//Integer aux = Integer.parseInt(ids);
