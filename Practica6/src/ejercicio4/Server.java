@@ -58,14 +58,14 @@ public class Server implements Chat {
 			e.printStackTrace();
 		}
     
-		difundir("Server: se ha conectado un cliente!");
+		System.out.println("Server: se ha conectado un cliente!");
 		return "El servidor acepta tu conexion. ID: "+clientIDCounter;
 	}
 
 	@Override
 	public String darseDeBaja(Integer id) throws RemoteException {
-		if(clientes.remove(id)!=null)	difundir("Server: se ha desconectado el cliente: "+id);
-		else difundir("Server: NO se ha desconectado el cliente: "+id);
+		if(clientes.remove(id)!=null)	System.out.println("Server: se ha desconectado el cliente: "+id);
+		else System.out.println("Server: NO se ha desconectado el cliente: "+id);
 		return "Te has desconectado del servidor";
 	}
 
