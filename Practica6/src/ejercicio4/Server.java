@@ -52,21 +52,20 @@ public class Server implements Chat {
         Receiver stub;
 		try {
 			stub = (Receiver) registry.lookup("Receiver"); 
-			clientes.put(clientIDCounter.incrementAndGet(), stub);
+			clientes.put(new Integer(clientIDCounter.incrementAndGet()), stub);
 			
 		} catch (NotBoundException e) {
 			e.printStackTrace();
 		}
     
-		System.out.println("Server: se ha conectado un cliente!");
+		difundir("Server: se ha conectado un cliente!");
 		return "El servidor acepta tu conexion. ID: "+clientIDCounter;
 	}
 
 	@Override
 	public String darseDeBaja(Integer id) throws RemoteException {
-		clientes.remove(id);
-		
-		System.out.println("Server: se ha desconectado el cliente: "+id);
+		if(clientes.remove(id)!=null)	difundir("Server: se ha desconectado el cliente: "+id);
+		else difundir("Server: NO se ha desconectado el cliente: "+id);
 		return "Te has desconectado del servidor";
 	}
 
@@ -75,10 +74,12 @@ public class Server implements Chat {
 		System.out.println("Server: se recibe mensaje>> " + mensaje);
 		System.out.println("Servidor broadcast mensaje "+msgCounter.incrementAndGet());
 		
+		String msgIdentificado = mensaje +" :: "+ msgCounter.toString();
+		
 		if (clientes.size() > MUCHOS_CLIENTES){
 			// Lanzamos hilos para difundir el mensaje a cada cliente
 			for (Receiver rec : clientes.values()){ // values() garantiza acceso concurrente en ese instante
-				EntregarrMensajeAction action = new EntregarrMensajeAction(rec, mensaje);
+				EntregarrMensajeAction action = new EntregarrMensajeAction(rec, msgIdentificado);
 				pool.invoke(action);
 			}
 		}
