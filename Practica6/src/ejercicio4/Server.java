@@ -6,7 +6,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -18,8 +19,7 @@ public class Server implements Chat {
 	static private ConcurrentHashMap<Integer, Receiver> clientes;
 	static private AtomicInteger clientIDCounter;
 	static private AtomicInteger msgCounter;
-	private ForkJoinPool pool;
-	private static int maxHilos = 16;
+	private static ExecutorService pool;
 	private static int MUCHOS_CLIENTES = 0;
 		
     public Server() {
@@ -27,7 +27,7 @@ public class Server implements Chat {
     	clientIDCounter = new AtomicInteger(0);
     	clientes = new ConcurrentHashMap<Integer, Receiver>();
     	
-    	pool = new ForkJoinPool(maxHilos); // cachedthreadpool
+    	pool = Executors.newCachedThreadPool();
     }
 
     public static void main(String args[]) {
@@ -80,7 +80,7 @@ public class Server implements Chat {
 			// Lanzamos hilos para difundir el mensaje a cada cliente
 			for (Receiver rec : clientes.values()){ // values() garantiza acceso concurrente en ese instante
 				EntregarrMensajeAction action = new EntregarrMensajeAction(rec, msgIdentificado);
-				pool.invoke(action);
+				pool.submit(action);
 			}
 		}
 		else

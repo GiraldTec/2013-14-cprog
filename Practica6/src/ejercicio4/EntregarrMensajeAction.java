@@ -1,10 +1,8 @@
 package ejercicio4;
 
 import java.rmi.RemoteException;
-import java.util.concurrent.RecursiveAction;
 
-public class EntregarrMensajeAction extends RecursiveAction {
-	private static final long serialVersionUID = 28354910422092509L;
+public class EntregarrMensajeAction implements Runnable {
 	private Receiver client;
 	private String msg;
 
@@ -14,7 +12,7 @@ public class EntregarrMensajeAction extends RecursiveAction {
 	}
 
 	@Override
-	protected void compute() {
+	public void run() {
 		try {
 			client.entregarMensaje(msg);
 		} catch (RemoteException e) {
