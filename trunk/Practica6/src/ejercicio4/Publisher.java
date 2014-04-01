@@ -1,6 +1,5 @@
 package ejercicio4;
 
-import java.util.Iterator;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public abstract class Publisher extends Thread {
