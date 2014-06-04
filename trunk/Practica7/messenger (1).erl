@@ -52,9 +52,7 @@
 %%% Change the function below to return the name of the node where the
 %%% messenger server runs
 server_node() ->
-    server@Nymph.
-
-    %%%pto0110.
+    server@pto0111.
 
 %%% This is the server process for the "messenger"
 %%% the user list has the format [{ClientPid1, Name1},{ClientPid22, Name2},...]
@@ -65,6 +63,7 @@ server() ->
 server(User_List) ->
     receive
         {From, logon, Name} ->
+	    io:format("alguien hace logon: ~w~n", [From]),
             New_User_List = server_logon(From, Name, User_List),
             server(New_User_List);
         {'EXIT', From, _} ->
@@ -166,6 +165,7 @@ client(Server_Node) ->
             await_result();
 	{message_all, Message} ->
             {messenger, Server_Node} ! {self(), message_all, Message},
+	    io:format("Haciendo broadcast ~n", []),
             await_result();
         {message_from, FromName, Message} ->
             io:format("Message from ~p: ~p~n", [FromName, Message])
