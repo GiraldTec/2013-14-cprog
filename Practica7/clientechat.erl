@@ -1,52 +1,5 @@
-%%% Message passing utility.  
-%%% User interface:
-%%% login(Name)
-%%%     One user at a time can log in from each Erlang node in the
-%%%     system messenger: and choose a suitable Name. If the Name
-%%%     is already logged in at another node or if someone else is
-%%%     already logged in at the same node, login will be rejected
-%%%     with a suitable error message.
-%%% logoff()
-%%%     Logs off anybody at at node
-%%% message(ToName, Message)
-%%%     sends Message to ToName. Error messages if the user of this 
-%%%     function is not logged on or if ToName is not logged on at
-%%%     any node.
-%%%
-%%% One node in the network of Erlang nodes runs a server which maintains
-%%% data about the logged on users. The server is registered as "messenger"
-%%% Each node where there is a user logged on runs a client process registered
-%%% as "mess_client" 
-%%%
-%%% Protocol between the client processes and the server
-%%% ----------------------------------------------------
-%%% 
-%%% To server: {ClientPid, logon, UserName}
-%%% Reply {messenger, stop, user_exists_at_other_node} stops the client
-%%% Reply {messenger, logged_on} logon was successful
-%%%
-%%% When the client terminates for some reason
-%%% To server: {'EXIT', ClientPid, Reason}
-%%%
-%%% To server: {ClientPid, message_to, ToName, Message} send a message
-%%% Reply: {messenger, stop, you_are_not_logged_on} stops the client
-%%% Reply: {messenger, receiver_not_found} no user with this name logged on
-%%% Reply: {messenger, sent} Message has been sent (but no guarantee)
-%%%
-%%% To client: {message_from, Name, Message},
-%%%
-%%% Protocol between the "commands" and the client
-%%% ---------------------------------------------- 
-%%%
-%%% Started: messenger:client(Server_Node, Name)
-%%% To client: logoff
-%%% To client: {message_to, ToName, Message}
-%%%
-%%% Configuration: change the server_node() function to return the
-%%% name of the node where the messenger server runs
-
 -module(clientechat).
--export([logon/1, logoff/0, broadcast/1, client/2]).
+-export([logon/1, logoff/0, broadcast/1, client/2, new_publisher/0]).
 
 %%% Change the function below to return the name of the node where the
 %%% servidorchat runs
@@ -59,12 +12,15 @@ logon(Name) ->
     case whereis(mess_client) of 
         undefined ->
             register(mess_client, 
-                     spawn(clientechat, client, [server_node(), Name]));
+                     spawn(clientechat, client, [server_node(), Name])),
+            register(mess_publisher,
+                     spawn(clientechat, new_publisher,[]));
         _ -> already_logged_on
     end.
 
 logoff() ->
-    mess_client ! logoff.
+    mess_client ! logoff,
+    mess_publisher ! logoff.
 
 broadcast(Message) ->
     case whereis(mess_client) of % Test if the client is running
@@ -73,6 +29,46 @@ broadcast(Message) ->
         _ -> mess_client ! {message_all, Message},
              ok
 end.
+%%% The publisher 
+new_publisher() ->
+    publisher([]).
+
+publisher(Message_List) ->
+    receive
+        logoff ->
+            exit(normal);
+        {publish_m,FromName,Message,Message_Counter} ->
+            New_Message_List = 
+                lists:append([{FromName,Message,Message_Counter}],Message_List),
+            publisher(New_Message_List)
+    after 3000 ->
+        case Message_List of
+            [] -> 
+                publisher(Message_List);
+            _ ->
+                {FromName,Message,Message_Counter} = minCounter(Message_List),
+                New_Message_List = del_minCounter(Message_List,Message_Counter),
+                io:format("Message from ~p(~p): ~p~n", [FromName, Message_Counter, Message]),
+                publisher(New_Message_List)
+        end
+    end.
+
+minCounter([{N,M,MC}|ML]) ->
+    aux_minCounter(ML,{N,M,MC}).
+aux_minCounter([],Acc) ->
+    Acc;
+aux_minCounter([{N,M,MC}|ML],{_,_,AccMC})
+    when MC < AccMC ->
+        aux_minCounter(ML,{N,M,MC});
+aux_minCounter([_|ML],Acc) ->
+    aux_minCounter(ML,Acc).
+
+del_minCounter([],_) -> [];
+del_minCounter([{_,_,C}|ML],MC)
+    when C == MC ->
+        ML;
+del_minCounter([{N,M,C}|ML],MC) ->
+    [{N,M,C}|del_minCounter(ML,MC)].
 
 %%% The client process which runs on each user node
 client(Server_Node, Name) ->
@@ -87,8 +83,8 @@ client(Server_Node) ->
         {message_all, Message} ->
             {servChat, Server_Node} ! {self(), message_all, Message},
             await_result();
-        {message_from, FromName, Message} ->
-            io:format("Message from ~p: ~p~n", [FromName, Message])
+        {message_from, FromName, Message,Message_Counter} ->
+            mess_publisher ! {publish_m,FromName,Message,Message_Counter}
     end,
     client(Server_Node).
 
