@@ -1,5 +1,5 @@
 -module(servidorchat).
--export([start_server/0, server/0]).
+-export([start_server/0, server/0, entregarMensaje/4]).
 
 %%% This is the server process for the "messenger"
 %%% the user list has the format [{ClientPid1, Name1},{ClientPid22, Name2},...]
@@ -18,7 +18,7 @@ server(User_List,Message_Counter) ->
             server(New_User_List,Message_Counter);
     	{From, message_all, Message} ->
             New_Message_Counter = incrementa(Message_Counter),
-            entregarMensaje(User_List,From,Message,New_Message_Counter),
+            spawn(servidorchat,entregarMensaje,[User_List,From,Message,New_Message_Counter]),
             
             io:format("Message_Counter is now: ~p~n", [New_Message_Counter]),
             server(User_List,New_Message_Counter)
@@ -26,6 +26,7 @@ server(User_List,Message_Counter) ->
 
 entregarMensaje(User_List,From,Message,Message_Counter) ->
     [ToPid ! {server_transfer(From, To, Message,Message_Counter, User_List)} || {ToPid, To} <- User_List].
+
 incrementa(V) ->
     V + 1.
 
