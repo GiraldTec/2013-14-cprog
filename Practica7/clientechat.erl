@@ -41,7 +41,7 @@ publisher(Message_List) ->
             New_Message_List = 
                 lists:append([{FromName,Message,Message_Counter}],Message_List),
             publisher(New_Message_List)
-    after 3000 ->
+    after 100 ->
         case Message_List of
             [] -> 
                 publisher(Message_List);
